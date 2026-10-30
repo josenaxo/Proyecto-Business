@@ -1,7 +1,15 @@
+<<<<<<< HEAD
 # Versions used for the W2 run (Python 3.13.7)
+=======
+>>>>>>> avanzeRolA
 pandas==2.3.3
 numpy==2.3.3
 matplotlib==3.10.6
 seaborn==0.13.2
+<<<<<<< HEAD
 scikit-learn==1.7.2
 jupyter
+=======
+jupyterlab==4.4.7
+nbconvert==7.16.6
+>>>>>>> avanzeRolA

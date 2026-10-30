@@ -21,6 +21,9 @@ The project has three stages:
 | C1 (Sep 29, 2026) | Persistence KPI, data preparation and EDA, Central service | `DOCS/GROUP_01_C1_Report.pdf`, `DOCS/GROUP_01_C1_Slides.pdf`, `Analysis/EDA.ipynb` |
 | **W2 (Oct 29, 2026)** | Same KPI in six metropolitan services, data validation, sampling, leakage audit, person-level holdout | **`notebooks/W2_project.ipynb`** |
 
+**Also, we were working in Analysis/EDA2.ipynb** 
+*We didn't want to drop that work even when we re-did it in W2_project.ipynb, because you could compare directly with EDA.ipynb, in the W1 and C1 work, with the same methodology.*
+
 ## Repository structure
 
 ```

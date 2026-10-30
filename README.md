@@ -4,6 +4,7 @@
 **Instructor:** Tomás Fontecilla Correa
 **Group:** 01 · Alessandro Lavezzi · José Saavedra
 **Current assessment:** W2 · From Exploratory Analysis to Credible Validation (due October 29, 2026)
+**Repository:** https://github.com/josenaxo/Proyecto-Business · W2 version: tag `W2`
 
 ## Project
 

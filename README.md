@@ -3,71 +3,102 @@
 **Course:** Business Intelligence · IIB423T-1 · Universidad del Desarrollo
 **Instructor:** Tomás Fontecilla Correa
 **Group:** 01 · Alessandro Lavezzi · José Saavedra
-**Current assessment:** W2 · From Exploratory Analysis to Credible Validation (due October 29, 2026)
-**Repository:** https://github.com/josenaxo/Proyecto-Business · W2 version: tag `W2`
+**Assessed version:** C3 final repository (24 November 2026). Source repository: https://github.com/josenaxo/Proyecto-Business
 
-## Project
+## Question and decision
 
-The project studies the **persistent use of overtime** among fixed-term (*contrata*) staff, using the monthly payrolls that the health services publish under Active Transparency.
+> On 1 September 2025, using only what was known that day, can we anticipate which fixed-term (*contrata*) staff will show **persistent overtime** (overtime in at least 75% of their months) between September 2025 and August 2026?
 
-- **KPI (persistence rate):** people who received overtime (daytime + night) in at least 75% of their months on the payroll, divided by people present for at least 12 months.
-- **Unit of observation:** the person-month, keyed by (service, period, full name).
+- **Data:** monthly payrolls of fixed-term staff published by six Santiago Metropolitan Health Services on the State Transparency Portal (Law 20.285), September 2024 – August 2026. One input row is one contract-month record; analysis rows are person-months and, for the model, one person.
 - **Intended decision:** help people-management units prioritize which staff groups and positions to review for staffing.
+- **Route:** classification. Positive class = persistent. Model: logistic regression. Reference: "whoever was persistent last year will be persistent this year".
+- **Main result (test set, 1,192 people, 204 persistent):** the model finds more persistent people than the rule (recall 0.83 vs 0.76) at the cost of more false alarms (precision 0.66 vs 0.71). F1 is practically equal (0.739 vs 0.736), so **we do not claim the model predicts better than the rule**. Past overtime is the dominant signal (odds ratio 5.9 per standard deviation).
 
-The project has three stages:
+## Reading order
 
-| Stage | Scope | Main artifact |
-|---|---|---|
-| W1 (Sep 25, 2026) | Two candidate questions, Central service (SSMC) | `DOCS/GROUP_01_W1_Report.pdf`, `Analysis/EDA.ipynb` |
-| C1 (Sep 29, 2026) | Persistence KPI, data preparation and EDA, Central service | `DOCS/GROUP_01_C1_Report.pdf`, `DOCS/GROUP_01_C1_Slides.pdf`, `Analysis/EDA.ipynb` |
-| **W2 (Oct 29, 2026)** | Same KPI in six metropolitan services, data validation, sampling, leakage audit, person-level holdout | **`notebooks/W2_project.ipynb`** |
+| # | File | What it contains | Stage |
+|---|---|---|---|
+| 1 | `notebooks/W2_project.ipynb` | Data description, quality checks, preparation, sampling, leakage audit, person-level train/validation/test split | W2 |
+| 2 | `notebooks/C2_classification.ipynb` | Response to W2 feedback, decision-date cohort, features, target, reference rule, logistic regression, threshold on validation, single test evaluation, interpretation | C2 |
+| 3 | `notebooks/03_C3_final_views.ipynb` | The four final views, the written visual rules and where they are implemented | C3 / W3 design |
+| 4 | `presentations/GROUP_01_C3_Presentations.pptx` | Presentation 1 (audience) and Presentation 2 (internal review) | C3 |
 
-**Also, we were working in Analysis/EDA2.ipynb** 
-*We didn't want to drop that work even when we re-did it in W2_project.ipynb, because you could compare directly with EDA.ipynb, in the W1 and C1 work, with the same methodology.*
+Earlier work, kept unchanged for traceability: `Analysis/EDA.ipynb` (W1/C1, Central service) and the reports and slides in `DOCS/`.
+
+**All notebooks are executed and their outputs are saved. They can be read without running code.** The datasets are **not** included in this delivery (course rule); the notebooks show compact summary tables and plots, and the source and download dates are described below.
 
 ## Repository structure
 
 ```
-GROUP_01_C1/
-├── README.md
-├── requirements.txt
-├── notebooks/
-│   └── W2_project.ipynb          W2 deliverable (English, executed, outputs saved)
-├── Analysis/
-│   ├── EDA.ipynb                 W1/C1 analysis of the Central service
-│   └── EDA2.ipynb                W2 working draft in Spanish (superseded by notebooks/W2_project.ipynb)
-├── DOCS/                         W1 and C1 reports and C1 slides (PDF)
-├── Data/
-│   ├── TransparenciaActiva_YYYY-MM.csv               Central (Centro), 24 files
-│   ├── Norte_TransparenciaActiva_YYYY-MM.csv         North, 25 files
-│   ├── Oriente_TransparenciaActiva_YYYY-MM.csv       East, 25 files
-│   ├── Occidente_TransparenciaActiva_YYYY-MM.csv     West, 25 files
-│   ├── Sur_TransparenciaActiva_YYYY-MM_<unit>.csv    South, 85 files (one per hospital/unit and month)
-│   ├── SurOriente_TransparenciaActiva_YYYY-MM.csv    South-East, 25 files
-│   ├── processed/analitica_persona_mes.csv           C1 person-month table (numeric ID, no names)
-│   └── figura_*.png                                  W1/C1 figures
-└── figures/                      W2 figures, written by notebooks/W2_project.ipynb
+README.md
+requirements.txt
+notebooks/
+  W2_project.ipynb            data description, preparation, split
+  C2_classification.ipynb     model, reference, evaluation (reuses W2 preparation and split)
+  03_C3_final_views.ipynb     final views, saved with their outputs
+visual_system/
+  style.py                    shared visual rules (colours, text styles, helpers) imported by the final charts
+figures/                      saved figures (c2_*, c3_*, W2 figures)
+presentations/                both C3 presentations
+Analysis/EDA.ipynb            W1/C1 analysis (unchanged)
+DOCS/                         W1, C1 and C2 reports and slides (unchanged)
 ```
 
-The W1 and C1 artifacts are kept unchanged, and their history is in git.
+## Pipeline and traceability
 
-## How to run the W2 notebook
+`payroll CSV files (Transparency Portal)` → **W2 notebook** (read and join six services, validate, keep Sep 2024 – Aug 2026, person-months, person-level split 70/15/15, `SEED = 42`) → **C2 notebook** (cohort known on 1 Sep 2025, features from Sep 2024 – Jul 2025, gap month Aug 2025, target from Sep 2025 – Aug 2026, reference rule, model fitted on training only, threshold chosen on validation, test used once) → **C3 notebook** (draws the saved C2 numbers using `visual_system/style.py`).
 
-```bash
-python -m venv .venv
-.venv\Scripts\activate             # macOS/Linux: source .venv/bin/activate
-pip install -r requirements.txt
-```
+| Result | Where it is computed | Saved evidence |
+|---|---|---|
+| People in the W2 split (16,791) | W2 notebook, section 6 | W2 notebook output |
+| Cohort of 8,732 people, 8,134 labelled, 8,110 after excluding name matches across services | C2 notebook, sections 1.2–1.3 | C2 notebook output |
+| Persistent in year 2: 18.3% of labelled people; test 17.1% | C2 notebook, section 1.3 | C2 notebook output |
+| Reference rule vs model, test metrics and confusion matrices | C2 notebook, section 4 | C2 notebook output, `figures/c2_confusion_test.png` |
+| Odds ratios | C2 notebook, section 3.2 | C2 notebook output, `figures/c3_view3_factors.png` |
+| Final views | C3 notebook | saved outputs, `figures/c3_*.png` |
 
-1. Open `notebooks/W2_project.ipynb` in JupyterLab or VS Code and run **Restart Kernel → Run All**. Alternatively, run from the command line:
-   ```bash
-   cd notebooks
-   jupyter nbconvert --to notebook --execute --inplace W2_project.ipynb
-   ```
-2. The notebook reads every CSV from `../Data/` (paths are relative to `notebooks/`) and writes six figures to `../figures/`. It writes nothing to `Data/`.
-3. Run time is under one minute. Every random step uses `SEED = 42` (the 25% sample in §4, the 80/20 illustration in §5 and the person-level split in §6), so results are identical on each run.
+The C3 notebook asserts that its input numbers add up to the C2 results (1,192 test people, 204 persistent, matrices consistent with the metrics table).
 
-The notebook was tested with Python 3.13.7 and the versions in `requirements.txt`. It ran top to bottom with no errors before submission.
+## Visual system
+
+Rules are written in the header of `visual_system/style.py` and in section 1 of `notebooks/03_C3_final_views.ipynb`, and are applied by the four final charts.
+
+- **Colour:** blue = logistic regression; grey = reference rule, neutral context and share ramps; amber = highlight only (differences, errors, dominant factor).
+- **Redundant cues (no colour needed):** the reference rule is hatched; every value is printed; circles = numeric features, diamonds = categories; error cells are named in words.
+- **Text:** title states the finding; subtitle gives population, period and unit; source line at the bottom.
+- **Scales:** scores 0–1 from zero (never truncated); shares 0–100% on the same scale in both panels; odds ratios on a log scale centred on 1 (a different measure, so a different scale, with the same colour meaning).
+- **Highlighting:** one per view. **Layout:** title → subtitle → plot → legend → source.
+
+**Design selection (W3).** Each of the three views was first drawn in a weaker version (rainbow colours, truncated axis, unlabelled matrix, bars in raw table order) and redesigned. The final designs were kept because each supports one task for the people-management audience: *compare* model and rule, *summarize* the errors, *identify* the dominant factor. Each view has a stated limit (hidden uncertainty, shares that make false positives look small, mixed odds-ratio scales); we kept the designs because their benefit for the task is larger than the limit, and we state the limit in the notebook.
+
+**View 4 (added for C3).** The W2 grouped-bar chart of persistence by staff group and service (`figures/fig_c2_persistence_by_staff_group_service.png`, one default colour per service) was redrawn with the same rules as a grey 0–100% table with printed shares and group sizes, and one amber highlight (auxiliary staff, the highest group in 5 of 6 services). Its task is to *locate* where persistence is concentrated, which supports the recommendation in Presentation 1 (slide 6). It describes all people with at least 12 months (Sep 2024 – Aug 2026), not the C2 test set, and its subtitle says so; cells with fewer than 30 people are marked.
+
+**Supporting view for Presentation 2.** `figures/c3_view5_validation_vs_test.png` (C3 notebook, section 7) compares the F1 of the rule and the model on validation (+0.051) and on the test set (+0.003), with the same colours, hatching and 0–1 scale as view 1. It shows how using the test set only once shaped the central message.
+
+## Decisions and development
+
+| Stage | Decision | Reason / evidence |
+|---|---|---|
+| W2 → C2 (feedback) | Define the prediction date (1 Sep 2025) and a **decision-date cohort**; features only from Sep 2024 – Jul 2025 | avoids leakage: the model never sees the period it predicts (C2 notebook, section 1.1) |
+| W2 → C2 (feedback) | One-month **gap** (Aug 2025) between features and target | payroll records the month paid, not the month worked; 372 contract rows (0.66% of rows with overtime) were paid after the contract ended (C2 notebook, section 1.0) |
+| W2 → C2 (feedback) | **Exclude names that appear in more than one service** (24 people in the C2 data) | no national ID, so merging could join two different people (C2 notebook, sections 1.0 and 1.3) |
+| Kept | 75% persistence threshold and minimum of 6 months | same definition as the KPI since C1; with fewer months the share is unstable |
+| Kept | W2 person-level split, no new split | the same person is never in training and test; the test set stays the one fixed in W2 |
+| C2 | Logistic regression, default L2 `C = 1`, threshold 0.35 chosen on validation by F1 | simple and explainable; default 0.5 not assumed for an 18% positive class |
+| C2 | Report that the model does **not clearly beat** the reference rule | test F1 0.739 vs 0.736 is within sampling variation (about 200 persistent people) |
+| W3 → C3 | Keep the three redesigned views and the shared rules; redraw the W2 staff-group × service chart as view 4 with the same rules | see "Visual system" above |
+
+**Known limits.** One decision date and one year to predict; people identified only by name; payroll month is the payment month; 598 cohort people left or stayed under 6 months and cannot be evaluated; the test set was already seen descriptively in W2. A useful prediction does not prove that a staffing review would reduce overtime.
+
+## Contributions
+
+- **José Saavedra:** C2 dataset (features, target), reuse of the W2 split, evaluation functions, reference rule and logistic regression pipeline.
+- **Alessandro Lavezzi:** response to W2 feedback (decision-date cohort, gap month, name matches), coefficients, threshold choice, test evaluation and interpretation; C3 final views and visual rules.
+- Both members reviewed the whole repository and the results quoted in the presentations.
+
+## Software
+
+Python 3.13.7 with pandas 2.3.3, numpy 2.3.3, matplotlib 3.10.6, seaborn 0.13.2 (only for the heatmaps in the W2 figure C6), scikit-learn 1.7.2, JupyterLab 4.4.7 and nbconvert 7.16.6 (see `requirements.txt`). No installation is needed to read the notebooks.
 
 ## Data provenance
 
@@ -81,7 +112,7 @@ The notebook was tested with Python 3.13.7 and the versions in `requirements.txt
   | South, South-East | 85 / 25 | 2024-11 to 2026-09 / 2024-09 to 2026-09 | Oct 23, 2026 |
 
 - **South (Sur)** publishes one file per hospital or unit from January 2025 onwards (Hospital Buin-Paine, Hospital El Peral, Hospital Lucio Córdova, Servicio Sur). It has no data for September and October 2024, and the Hospital El Peral file is missing for October 2025. The notebook reads the period from the file name and joins the units.
-- **Format:** semicolon-separated, latin-1 encoding, one row per contract-month record. The files are stored exactly as downloaded.
+- **Format:** semicolon-separated, latin-1 encoding, one row per contract-month record. The files were used exactly as downloaded; **they are not part of this delivery** (course rule).
 - **Analysis window:** September 2024 – August 2026 (the 24 months common to every service). September 2026 rows are loaded but excluded, and the row counts before and after are reported in §0.2.
 - **Scope:** fixed-term staff only. Permanent (*planta*), fee-based and Labor Code staff are not in this payroll (see §4 of the notebook).
 
@@ -98,4 +129,4 @@ The input files contain employees' full names, published under Law 20.285 on acc
 
 ## AI use
 
-AI assistance (Claude, Anthropic) was used for coding, translation and drafting. The disclosure is in §7.2 of the W2 notebook and in §7.4 of the C1 report.
+AI assistance (Claude, Anthropic, through Claude Code) was used for coding, translation, drafting text and building the C3 final views and presentations. We checked its output by running the notebooks from top to bottom, verifying the metric functions on a hand-calculated example (C2, section 2.1), checking that preprocessing is fitted on training data only, and comparing every number quoted in the notebooks, README and presentations with the saved outputs. The team is responsible for the choices of task, cohort, features, threshold rule, visual design and interpretation. Earlier disclosures: section 7.2 of the W2 notebook, section 6 of the C2 notebook and section 7.4 of the C1 report.

@@ -3,7 +3,7 @@
 **Course:** Business Intelligence · IIB423T-1 · Universidad del Desarrollo
 **Instructor:** Tomás Fontecilla Correa
 **Group:** 01 · Alessandro Lavezzi · José Saavedra
-**Assessed version:** C3 final repository (24 November 2026). Source repository: https://github.com/josenaxo/Proyecto-Business
+**Assessed version:** C3 final delivery submitted through Canvas on 24 November 2026 (`GROUP_01_C3.zip`, the root of branch `master` of the source repository). Source repository: https://github.com/josenaxo/Proyecto-Business
 
 ## Question and decision
 
@@ -23,7 +23,7 @@
 | 3 | `notebooks/03_C3_final_views.ipynb` | The four final views, the written visual rules and where they are implemented | C3 / W3 design |
 | 4 | `presentations/GROUP_01_C3_Presentations.pptx` | Presentation 1 (audience) and Presentation 2 (internal review) | C3 |
 
-Earlier work, kept unchanged for traceability: `Analysis/EDA.ipynb` (W1/C1, Central service) and the reports and slides in `DOCS/`.
+Earlier work, kept for traceability: `Analysis/EDA.ipynb` (W1/C1, Central service; unchanged except one table preview that listed employee names, replaced by a note in cell 6) and the reports and slides in `DOCS/`.
 
 **All notebooks are executed and their outputs are saved. They can be read without running code.** The datasets are **not** included in this delivery (course rule); the notebooks show compact summary tables and plots, and the source and download dates are described below.
 
@@ -40,13 +40,13 @@ visual_system/
   style.py                    shared visual rules (colours, text styles, helpers) imported by the final charts
 figures/                      saved figures (c2_*, c3_*, W2 figures)
 presentations/                both C3 presentations
-Analysis/EDA.ipynb            W1/C1 analysis (unchanged)
+Analysis/EDA.ipynb            W1/C1 analysis (names preview removed)
 DOCS/                         W1, C1 and C2 reports and slides (unchanged)
 ```
 
 ## Pipeline and traceability
 
-`payroll CSV files (Transparency Portal)` → **W2 notebook** (read and join six services, validate, keep Sep 2024 – Aug 2026, person-months, person-level split 70/15/15, `SEED = 42`) → **C2 notebook** (cohort known on 1 Sep 2025, features from Sep 2024 – Jul 2025, gap month Aug 2025, target from Sep 2025 – Aug 2026, reference rule, model fitted on training only, threshold chosen on validation, test used once) → **C3 notebook** (draws the saved C2 numbers using `visual_system/style.py`).
+`payroll CSV files (Transparency Portal)` → **W2 notebook** (read and join six services, validate, keep Sep 2024 – Aug 2026, person-months, person-level split 70/15/15, `SEED = 42`) → **C2 notebook** (cohort known on 1 Sep 2025, features from Sep 2024 – Jul 2025, gap month Aug 2025, target from Sep 2025 – Aug 2026, reference rule, model fitted on training only, threshold chosen on validation, test used once) → **C3 notebook** (draws the saved C2 numbers, and the W2 staff group × service table for view 4, using `visual_system/style.py`).
 
 | Result | Where it is computed | Saved evidence |
 |---|---|---|
@@ -55,6 +55,8 @@ DOCS/                         W1, C1 and C2 reports and slides (unchanged)
 | Persistent in year 2: 18.3% of labelled people; test 17.1% | C2 notebook, section 1.3 | C2 notebook output |
 | Reference rule vs model, test metrics and confusion matrices | C2 notebook, section 4 | C2 notebook output, `figures/c2_confusion_test.png` |
 | Odds ratios | C2 notebook, section 3.2 | C2 notebook output, `figures/c3_view3_factors.png` |
+| Persistence by staff group and service (view 4) | W2 notebook, section 2.1 | W2 notebook output; C3 notebook, section 6 |
+| Validation vs test F1 (supporting view) | C2 notebook, sections 3.3 and 4.1 | C3 notebook, section 7 |
 | Final views | C3 notebook | saved outputs, `figures/c3_*.png` |
 
 The C3 notebook asserts that its input numbers add up to the C2 results (1,192 test people, 204 persistent, matrices consistent with the metrics table).
@@ -86,6 +88,8 @@ Rules are written in the header of `visual_system/style.py` and in section 1 of 
 | Kept | W2 person-level split, no new split | the same person is never in training and test; the test set stays the one fixed in W2 |
 | C2 | Logistic regression, default L2 `C = 1`, threshold 0.35 chosen on validation by F1 | simple and explainable; default 0.5 not assumed for an 18% positive class |
 | C2 | Report that the model does **not clearly beat** the reference rule | test F1 0.739 vs 0.736 is within sampling variation (about 200 persistent people) |
+| C2 → C3 (feedback) | The instructor suggested a second classifier and enriching the data (for example, scraped pay data). **Not added** | C3 asks for no new data or algorithms; one variable already reaches test F1 0.736 and the model adds +0.003, so a second classifier would face the same comparison. Listed as a next step (Presentation 2, slide 13) |
+| W3 → C3 (feedback) | Correct how errors are translated into workload and cost: 86 false positives **in total**, 24 **more** than the rule's 62; choose a threshold by **expected saving** (probability of persisting × overtime cost a review could avoid − review cost), not by comparing the overtime spending of flagged people with the review cost | C2 notebook, section 5; C3 notebook, section 8; Presentation 1, slide 4 notes; Presentation 2, slides 11 and 13 |
 | W3 → C3 | Keep the three redesigned views and the shared rules; redraw the W2 staff-group × service chart as view 4 with the same rules | see "Visual system" above |
 
 **Known limits.** One decision date and one year to predict; people identified only by name; payroll month is the payment month; 598 cohort people left or stayed under 6 months and cannot be evaluated; the test set was already seen descriptively in W2. A useful prediction does not prove that a staffing review would reduce overtime.
@@ -113,20 +117,20 @@ Python 3.13.7 with pandas 2.3.3, numpy 2.3.3, matplotlib 3.10.6, seaborn 0.13.2 
 
 - **South (Sur)** publishes one file per hospital or unit from January 2025 onwards (Hospital Buin-Paine, Hospital El Peral, Hospital Lucio Córdova, Servicio Sur). It has no data for September and October 2024, and the Hospital El Peral file is missing for October 2025. The notebook reads the period from the file name and joins the units.
 - **Format:** semicolon-separated, latin-1 encoding, one row per contract-month record. The files were used exactly as downloaded; **they are not part of this delivery** (course rule).
-- **Analysis window:** September 2024 – August 2026 (the 24 months common to every service). September 2026 rows are loaded but excluded, and the row counts before and after are reported in §0.2.
-- **Scope:** fixed-term staff only. Permanent (*planta*), fee-based and Labor Code staff are not in this payroll (see §4 of the notebook).
+- **Analysis window:** September 2024 – August 2026 (the 24 months common to every service). September 2026 rows are loaded but excluded, and the row counts before and after are reported in §0.2 of the W2 notebook.
+- **Scope:** fixed-term staff only. Permanent (*planta*), fee-based and Labor Code staff are not in this payroll (see §4.1 of the W2 notebook).
 
 ## Data notes
 
 - Each row is a contract record, not a person. Records are summed into person-months.
 - There is no national ID (RUT), so people are identified by (service, full name). 135 names appear in more than one service.
 - Missing values are written as `-` in some amount columns, never as empty cells. `No tiene` in the overtime columns means no payment and is coded as 0.
-- Known recording issues: Central has an atypical January 2025 and a staff-group error in December 2025; South's October 2025 is incomplete; South-East records holiday hours and much lower hours. The notebook flags these issues rather than deleting rows (§3).
+- Known recording issues: Central has an atypical January 2025 and a staff-group error in December 2025; South's October 2025 is incomplete; South-East records holiday hours and much lower hours. The W2 notebook flags these issues rather than deleting rows (§3).
 
 ## Privacy
 
-The input files contain employees' full names, published under Law 20.285 on access to public information. The notebook and the reports show only aggregated counts and rates, and no individual is identified. The processed C1 table replaces names with a numeric ID.
+The input files contain employees' full names, published under Law 20.285 on access to public information. The notebook and the reports show only aggregated counts and rates, and no individual is identified. No data file, processed table or extract is included in this delivery.
 
 ## AI use
 
-AI assistance (Claude, Anthropic, through Claude Code) was used for coding, translation, drafting text and building the C3 final views and presentations. We checked its output by running the notebooks from top to bottom, verifying the metric functions on a hand-calculated example (C2, section 2.1), checking that preprocessing is fitted on training data only, and comparing every number quoted in the notebooks, README and presentations with the saved outputs. The team is responsible for the choices of task, cohort, features, threshold rule, visual design and interpretation. Earlier disclosures: section 7.2 of the W2 notebook, section 6 of the C2 notebook and section 7.4 of the C1 report.
+AI assistance (Claude, Anthropic, through Claude Code) was used for coding, translation, and drafting text. We checked its output by running the notebooks from top to bottom, verifying the metric functions on a hand-calculated example (C2, section 2.1), checking that preprocessing is fitted on training data only, and comparing every number quoted in the notebooks, README and presentations with the saved outputs. The team is responsible for the choices of task, cohort, features, threshold rule, visual design and interpretation. Earlier disclosures: section 7.2 of the W2 notebook, section 6 of the C2 notebook and section 7.4 of the C1 report.
